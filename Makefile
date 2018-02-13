@@ -24,3 +24,10 @@ test:
 check:
 	gofmt -l -s -d pkg/ cmd/
 	go tool vet pkg/ cmd/
+
+.PHONY: integration
+integration:
+ifeq ($(GOOS),windows)
+else
+	hack/integration.sh
+endif
