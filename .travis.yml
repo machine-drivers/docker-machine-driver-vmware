@@ -1,0 +1,23 @@
+language: go
+os: 
+  - linux
+  - osx
+
+go:
+  - 1.9.x
+  - '1.9.4'
+go_import_path: github.com/machine-drivers/docker-machine-driver-vmware
+
+install:
+  - echo "Don't run anything."
+script:
+  - make test
+
+deploy:
+- provider: script
+  skip_cleanup: true
+  script: curl -sL http://git.io/goreleaser | bash
+  on:
+    tags: true
+    condition: $TRAVIS_OS_NAME = linux
+    go: '1.9.4'
