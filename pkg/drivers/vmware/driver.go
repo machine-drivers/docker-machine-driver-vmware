@@ -36,108 +36,26 @@ import (
 
 	"github.com/docker/machine/libmachine/drivers"
 	"github.com/docker/machine/libmachine/log"
-	"github.com/docker/machine/libmachine/mcnflag"
 	"github.com/docker/machine/libmachine/mcnutils"
 	"github.com/docker/machine/libmachine/ssh"
 	"github.com/docker/machine/libmachine/state"
+	"github.com/machine-drivers/docker-machine-driver-vmware/pkg/drivers/vmware/config"
 	cryptossh "golang.org/x/crypto/ssh"
 )
 
 const (
-	B2DUser        = "docker"
-	B2DPass        = "tcuser"
 	isoFilename    = "boot2docker.iso"
 	isoConfigDrive = "configdrive.iso"
 )
 
 // Driver for VMware
 type Driver struct {
-	*drivers.BaseDriver
-	Memory         int
-	DiskSize       int
-	CPU            int
-	ISO            string
-	Boot2DockerURL string
-
-	SSHPassword    string
-	ConfigDriveISO string
-	ConfigDriveURL string
-	NoShare        bool
+	*config.Config
 }
 
-const (
-	defaultSSHUser  = B2DUser
-	defaultSSHPass  = B2DPass
-	defaultDiskSize = 20000
-	defaultCPU      = 1
-	defaultMemory   = 1024
-)
-
-// GetCreateFlags registers the flags this driver adds to
-// "docker hosts create"
-func (d *Driver) GetCreateFlags() []mcnflag.Flag {
-	return []mcnflag.Flag{
-		mcnflag.StringFlag{
-			EnvVar: "VMWARE_BOOT2DOCKER_URL",
-			Name:   "vmware-boot2docker-url",
-			Usage:  "URL for boot2docker image",
-			Value:  "",
-		},
-		mcnflag.StringFlag{
-			EnvVar: "VMWARE_CONFIGDRIVE_URL",
-			Name:   "vmware-configdrive-url",
-			Usage:  "URL for cloud-init configdrive",
-			Value:  "",
-		},
-		mcnflag.IntFlag{
-			EnvVar: "VMWARE_CPU_COUNT",
-			Name:   "vmware-cpu-count",
-			Usage:  "number of CPUs for the machine (-1 to use the number of CPUs available)",
-			Value:  defaultCPU,
-		},
-		mcnflag.IntFlag{
-			EnvVar: "VMWARE_MEMORY_SIZE",
-			Name:   "vmware-memory-size",
-			Usage:  "size of memory for host VM (in MB)",
-			Value:  defaultMemory,
-		},
-		mcnflag.IntFlag{
-			EnvVar: "VMWARE_DISK_SIZE",
-			Name:   "vmware-disk-size",
-			Usage:  "size of disk for host VM (in MB)",
-			Value:  defaultDiskSize,
-		},
-		mcnflag.StringFlag{
-			EnvVar: "VMWARE_SSH_USER",
-			Name:   "vmware-ssh-user",
-			Usage:  "SSH user",
-			Value:  defaultSSHUser,
-		},
-		mcnflag.StringFlag{
-			EnvVar: "VMWARE_SSH_PASSWORD",
-			Name:   "vmware-ssh-password",
-			Usage:  "SSH password",
-			Value:  defaultSSHPass,
-		},
-		mcnflag.BoolFlag{
-			EnvVar: "VMWARE_NO_SHARE",
-			Name:   "vmware-no-share",
-			Usage:  "Disable the mount of your home directory",
-		},
-	}
-}
-
-func NewDriver(hostName, storePath string) drivers.Driver {
+func NewDriver(hostname, storePath string) drivers.Driver {
 	return &Driver{
-		CPU:         defaultCPU,
-		Memory:      defaultMemory,
-		DiskSize:    defaultDiskSize,
-		SSHPassword: defaultSSHPass,
-		BaseDriver: &drivers.BaseDriver{
-			SSHUser:     defaultSSHUser,
-			MachineName: hostName,
-			StorePath:   storePath,
-		},
+		Config: config.NewConfig(hostname, storePath),
 	}
 }
 
@@ -378,19 +296,19 @@ func (d *Driver) Start() error {
 	}
 
 	// Test if /var/lib/boot2docker exists
-	vmrun("-gu", B2DUser, "-gp", B2DPass, "directoryExistsInGuest", d.vmxPath(), "/var/lib/boot2docker")
+	vmrun("-gu", d.SSHUser, "-gp", d.SSHPassword, "directoryExistsInGuest", d.vmxPath(), "/var/lib/boot2docker")
 
 	// Copy SSH keys bundle
-	vmrun("-gu", B2DUser, "-gp", B2DPass, "CopyFileFromHostToGuest", d.vmxPath(), d.ResolveStorePath("userdata.tar"), "/home/docker/userdata.tar")
+	vmrun("-gu", d.SSHUser, "-gp", d.SSHPassword, "CopyFileFromHostToGuest", d.vmxPath(), d.ResolveStorePath("userdata.tar"), "/home/docker/userdata.tar")
 
 	// Expand tar file.
-	vmrun("-gu", B2DUser, "-gp", B2DPass, "runScriptInGuest", d.vmxPath(), "/bin/sh", "sudo sh -c \"tar xvf /home/docker/userdata.tar -C /home/docker > /var/log/userdata.log 2>&1 && chown -R docker:staff /home/docker\"")
+	vmrun("-gu", d.SSHUser, "-gp", d.SSHPassword, "runScriptInGuest", d.vmxPath(), "/bin/sh", "sudo sh -c \"tar xvf /home/docker/userdata.tar -C /home/docker > /var/log/userdata.log 2>&1 && chown -R docker:staff /home/docker\"")
 
 	// copy to /var/lib/boot2docker
-	vmrun("-gu", B2DUser, "-gp", B2DPass, "runScriptInGuest", d.vmxPath(), "/bin/sh", "sudo /bin/mv /home/docker/userdata.tar /var/lib/boot2docker/userdata.tar")
+	vmrun("-gu", d.SSHUser, "-gp", d.SSHPassword, "runScriptInGuest", d.vmxPath(), "/bin/sh", "sudo /bin/mv /home/docker/userdata.tar /var/lib/boot2docker/userdata.tar")
 
 	// Enable Shared Folders
-	vmrun("-gu", B2DUser, "-gp", B2DPass, "enableSharedFolders", d.vmxPath())
+	vmrun("-gu", d.SSHUser, "-gp", d.SSHPassword, "enableSharedFolders", d.vmxPath())
 
 	shareName, hostDir, shareDir := getShareDriveAndName()
 	if hostDir != "" && !d.NoShare {
@@ -398,9 +316,9 @@ func (d *Driver) Start() error {
 			return err
 		} else if !os.IsNotExist(err) {
 			// add shared folder, create mountpoint and mount it.
-			vmrun("-gu", B2DUser, "-gp", B2DPass, "addSharedFolder", d.vmxPath(), shareName, hostDir)
+			vmrun("-gu", d.SSHUser, "-gp", d.SSHPassword, "addSharedFolder", d.vmxPath(), shareName, hostDir)
 			command := mountCommand(shareName, shareDir)
-			vmrun("-gu", B2DUser, "-gp", B2DPass, "runScriptInGuest", d.vmxPath(), "/bin/sh", command)
+			vmrun("-gu", d.SSHUser, "-gp", d.SSHPassword, "runScriptInGuest", d.vmxPath(), "/bin/sh", command)
 		}
 	}
 	return nil
