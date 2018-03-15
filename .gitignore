@@ -1,3 +1,4 @@
 /docker-machine-driver-vmware
 /docker-machine-driver-vmware.exe
 /out
+dist/
