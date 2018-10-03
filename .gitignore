@@ -1,4 +1,38 @@
+#############################
+# Compiled source           #
+#############################
+dist/
+out/
 /docker-machine-driver-vmware
 /docker-machine-driver-vmware.exe
-/out
-dist/
+
+#############################
+# Go files                  #
+#############################
+*.dll
+*.dylib
+*.exe
+*.exe~
+*.so
+
+#############################
+# IDE generated files       #
+#############################
+.idea/
+.vscode/
+*.iml
+
+#############################
+# Logs and temp files       #
+#############################
+*.log
+*.out
+*.tmp
+*~
+
+#############################
+# OS generated files        #
+#############################
+Thumbs.db
+.directory
+.DS_Store
