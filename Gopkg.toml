@@ -26,8 +26,9 @@
 
 
 [[constraint]]
+  branch = "master"
+  source = "github.com/machine-drivers/machine"
   name = "github.com/docker/machine"
-  version = "0.13.0"
 
 [[constraint]]
   branch = "master"
@@ -39,4 +40,5 @@
 
 [prune]
   go-tests = true
+  non-go = true
   unused-packages = true
