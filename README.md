@@ -22,6 +22,14 @@ The latest version of the `docker-machine-driver-vmware` binary is available on 
 [GithHub Releases](https://github.com/machine-drivers/docker-machine-driver-vmware/releases) page.
 Download the the binary that corresponds to your OS into a directory residing in your PATH.
 
+### From Homebrew
+
+The driver is available for easy installation via Homebrew on macOS. 
+
+```shell
+$ brew install docker-machine-driver-vmware
+```
+
 ### From Source
 
 Make sure you have installed [Go](http://www.golang.org) and configured [GOPATH](http://golang.org/doc/code.html#GOPATH)
