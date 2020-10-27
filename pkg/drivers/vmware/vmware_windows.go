@@ -17,34 +17,11 @@ limitations under the License.
 package vmware
 
 import (
-	"path/filepath"
-	"strings"
-
+	"fmt"
 	"golang.org/x/sys/windows/registry"
+	"path/filepath"
 )
 
-var windowsInstallDir = `C:\Program Files (x86)\VMware\VMware Workstation`
-
-func init() {
-	// Parse HKEY_.CLASSES_ROOT\vm\shell\open\command's value like:
-	// "C:\Program Files (x86)\VMware\VMware Workstation\vmware.exe" "%1"
-	// in order to the Workstation install dir.
-	key, err := registry.OpenKey(registry.CLASSES_ROOT, `vm\shell\open\command`, registry.QUERY_VALUE)
-	if err != nil {
-		return
-	}
-	defer key.Close()
-
-	value, _, err := key.GetStringValue("")
-	if err != nil {
-		return
-	}
-
-	if value[0] == '"' {
-		values := strings.Split(value[1:], "\"")
-		windowsInstallDir = filepath.Dir(values[0])
-	}
-}
 
 func DhcpConfigFiles() string {
 	return `C:\ProgramData\VMware\vmnetdhcp.conf`
@@ -59,6 +36,33 @@ func SetUmask() {
 
 func setVmwareCmd(cmd string) string {
 	cmd = cmd + ".exe"
+	DefaultVMWareWSProductionRegistryKey := `SOFTWARE\WOW6432Node\VMware, Inc.`
+	DefaultVMwareCorePathKey := "Core"
+	k, err := registry.OpenKey(registry.LOCAL_MACHINE, DefaultVMWareWSProductionRegistryKey, registry.QUERY_VALUE)
+	if err != nil {
+		return ""
+	}
+	defer k.Close()
+	production, _, err := k.GetStringValue(DefaultVMwareCorePathKey)
+	if err != nil {
+		return ""
+	}
+
+	//Get the VMware Product Install Path
+	DefaultVMwareWSRegistryKey := fmt.Sprintf(`SOFTWARE\WOW6432Node\VMware, Inc.\%s`, production)
+	DefaultVMwareWSInstallPathKey := "InstallPath"
+
+	key, err := registry.OpenKey(registry.LOCAL_MACHINE, DefaultVMwareWSRegistryKey, registry.QUERY_VALUE)
+	if err != nil {
+		return ""
+	}
+	defer key.Close()
+
+	value, _, err := key.GetStringValue(DefaultVMwareWSInstallPathKey)
+	if err != nil {
+		return ""
+	}
+	windowsInstallDir := value
 	return filepath.Join(windowsInstallDir, cmd)
 }
 
