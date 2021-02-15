@@ -123,6 +123,11 @@ func (d *Driver) GetIP() (ip string, err error) {
 		return "", drivers.ErrHostIsNotRunning
 	}
 
+	// attempt to find the address from vmrun
+	if ip, err := d.getIPfromVmrun(); err == nil {
+		return ip, err
+	}
+
 	// determine MAC address for VM
 	macaddr, err := d.getMacAddressFromVmx()
 	if err != nil {
@@ -399,6 +404,18 @@ func (d *Driver) getMacAddressFromVmx() (string, error) {
 	log.Debugf("MAC address in VMX: %s", macaddr)
 
 	return macaddr, nil
+}
+
+func (d *Driver) getIPfromVmrun() (string, error) {
+	vmx := d.vmxPath()
+
+	ip := regexp.MustCompile(`\d+\.\d+\.\d+\.\d+`)
+	stdout, _, _ := vmrun("getGuestIPAddress", vmx)
+	if match := ip.FindString(stdout); match != "" {
+		return match, nil
+	}
+
+	return "", fmt.Errorf("could not get IP from vmrun")
 }
 
 func (d *Driver) getIPfromVmnetConfiguration(macaddr string) (string, error) {
