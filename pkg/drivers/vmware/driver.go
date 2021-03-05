@@ -89,6 +89,7 @@ func (d *Driver) SetConfigFromFlags(flags drivers.DriverOptions) error {
 	d.SSHPassword = flags.String("vmware-ssh-password")
 	d.SSHPort = 22
 	d.NoShare = flags.Bool("vmware-no-share")
+	d.WaitIP = flags.Int("vmware-wait-ip")
 
 	// We support a maximum of 16 cpu to be consistent with Virtual Hardware 10
 	// specs.
@@ -410,7 +411,7 @@ func (d *Driver) getIPfromVmrun() (string, error) {
 	vmx := d.vmxPath()
 
 	ip := regexp.MustCompile(`\d+\.\d+\.\d+\.\d+`)
-	stdout, _, _ := vmrun("getGuestIPAddress", vmx)
+	stdout, _, _ := vmrun_wait(time.Duration(d.WaitIP)*time.Millisecond, "getGuestIPAddress", vmx, "-wait")
 	if match := ip.FindString(stdout); match != "" {
 		return match, nil
 	}
