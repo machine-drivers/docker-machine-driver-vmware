@@ -22,12 +22,14 @@ package vmware
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/docker/machine/libmachine/log"
 )
@@ -55,7 +57,18 @@ func isMachineDebugEnabled() bool {
 
 func vmrun(args ...string) (string, string, error) {
 	cmd := exec.Command(vmrunbin, args...)
+	return vmrun_cmd(cmd)
+}
 
+func vmrun_wait(timeout time.Duration, args ...string) (string, string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, vmrunbin, args...)
+	return vmrun_cmd(cmd)
+}
+
+func vmrun_cmd(cmd *exec.Cmd) (string, string, error) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr
@@ -66,7 +79,7 @@ func vmrun(args ...string) (string, string, error) {
 		cmd.Stderr = io.MultiWriter(os.Stderr, cmd.Stderr)
 	}
 
-	log.Debugf("executing: %v %v", vmrunbin, strings.Join(args, " "))
+	log.Debugf("executing: %v", strings.Join(cmd.Args, " "))
 
 	err := cmd.Run()
 	if err != nil {

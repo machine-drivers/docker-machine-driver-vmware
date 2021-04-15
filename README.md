@@ -24,7 +24,7 @@ Download the the binary that corresponds to your OS into a directory residing in
 
 ### From Homebrew
 
-The driver is available for easy installation via Homebrew on macOS. 
+The driver is available for easy installation via Homebrew on macOS.
 
 ```shell
 $ brew install docker-machine-driver-vmware
@@ -60,6 +60,7 @@ $ docker-machine create --driver=vmware default
 - `--vmware-no-share`: Disable the mount of your home directory
 - `--vmware-ssh-password`: SSH password
 - `--vmware-ssh-user`: SSH user
+- `--vmware-wait-ip`: Time to wait for vmrun to get an ip (in milliseconds)
 
 #### Environment variables and default values
 
@@ -73,6 +74,7 @@ $ docker-machine create --driver=vmware default
 | `--vmware-no-share`        | VMWARE_NO_SHARE        | -                        |
 | `--vmware-ssh-password`    | VMWARE_SSH_PASSWORD    | `tcuser`                 |
 | `--vmware-ssh-user`        | VMWARE_SSH_USER        | `docker`                 |
+| `--vmware-wait-ip`         | VMWARE_WAIT_IP         | `30000`                  |
 
 
 ## License
