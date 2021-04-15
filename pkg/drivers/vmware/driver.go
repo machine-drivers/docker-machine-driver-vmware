@@ -89,6 +89,7 @@ func (d *Driver) SetConfigFromFlags(flags drivers.DriverOptions) error {
 	d.SSHPassword = flags.String("vmware-ssh-password")
 	d.SSHPort = 22
 	d.NoShare = flags.Bool("vmware-no-share")
+	d.WaitIP = flags.Int("vmware-wait-ip")
 
 	// We support a maximum of 16 cpu to be consistent with Virtual Hardware 10
 	// specs.
@@ -121,6 +122,11 @@ func (d *Driver) GetIP() (ip string, err error) {
 
 	if s != state.Running {
 		return "", drivers.ErrHostIsNotRunning
+	}
+
+	// attempt to find the address from vmrun
+	if ip, err := d.getIPfromVmrun(); err == nil {
+		return ip, err
 	}
 
 	// determine MAC address for VM
@@ -399,6 +405,18 @@ func (d *Driver) getMacAddressFromVmx() (string, error) {
 	log.Debugf("MAC address in VMX: %s", macaddr)
 
 	return macaddr, nil
+}
+
+func (d *Driver) getIPfromVmrun() (string, error) {
+	vmx := d.vmxPath()
+
+	ip := regexp.MustCompile(`\d+\.\d+\.\d+\.\d+`)
+	stdout, _, _ := vmrun_wait(time.Duration(d.WaitIP)*time.Millisecond, "getGuestIPAddress", vmx, "-wait")
+	if match := ip.FindString(stdout); match != "" {
+		return match, nil
+	}
+
+	return "", fmt.Errorf("could not get IP from vmrun")
 }
 
 func (d *Driver) getIPfromVmnetConfiguration(macaddr string) (string, error) {

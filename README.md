@@ -22,6 +22,14 @@ The latest version of the `docker-machine-driver-vmware` binary is available on 
 [GithHub Releases](https://github.com/machine-drivers/docker-machine-driver-vmware/releases) page.
 Download the the binary that corresponds to your OS into a directory residing in your PATH.
 
+### From Homebrew
+
+The driver is available for easy installation via Homebrew on macOS.
+
+```shell
+$ brew install docker-machine-driver-vmware
+```
+
 ### From Source
 
 Make sure you have installed [Go](http://www.golang.org) and configured [GOPATH](http://golang.org/doc/code.html#GOPATH)
@@ -52,6 +60,7 @@ $ docker-machine create --driver=vmware default
 - `--vmware-no-share`: Disable the mount of your home directory
 - `--vmware-ssh-password`: SSH password
 - `--vmware-ssh-user`: SSH user
+- `--vmware-wait-ip`: Time to wait for vmrun to get an ip (in milliseconds)
 
 #### Environment variables and default values
 
@@ -65,6 +74,7 @@ $ docker-machine create --driver=vmware default
 | `--vmware-no-share`        | VMWARE_NO_SHARE        | -                        |
 | `--vmware-ssh-password`    | VMWARE_SSH_PASSWORD    | `tcuser`                 |
 | `--vmware-ssh-user`        | VMWARE_SSH_USER        | `docker`                 |
+| `--vmware-wait-ip`         | VMWARE_WAIT_IP         | `30000`                  |
 
 
 ## License

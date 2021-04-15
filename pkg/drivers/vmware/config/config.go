@@ -31,6 +31,7 @@ const (
 	defaultDiskSize = 20000
 	defaultCPU      = 1
 	defaultMemory   = 1024
+	defaultWaitIP   = 30000
 )
 
 // Config specifies the configuration of driver VMware
@@ -47,6 +48,8 @@ type Config struct {
 	ConfigDriveISO string
 	ConfigDriveURL string
 	NoShare        bool
+
+	WaitIP int
 }
 
 // NewConfig creates a new Config
@@ -56,6 +59,7 @@ func NewConfig(hostname, storePath string) *Config {
 		Memory:      defaultMemory,
 		DiskSize:    defaultDiskSize,
 		SSHPassword: defaultSSHPass,
+		WaitIP:      defaultWaitIP,
 		BaseDriver: &drivers.BaseDriver{
 			SSHUser:     defaultSSHUser,
 			MachineName: hostname,
@@ -114,6 +118,12 @@ func (c *Config) GetCreateFlags() []mcnflag.Flag {
 			EnvVar: "VMWARE_NO_SHARE",
 			Name:   "vmware-no-share",
 			Usage:  "Disable the mount of your home directory",
+		},
+		mcnflag.IntFlag{
+			EnvVar: "VMWARE_WAIT_IP",
+			Name:   "vmware-wait-ip",
+			Usage:  "time to wait for vmrun to get an ip (in milliseconds)",
+			Value:  defaultWaitIP,
 		},
 	}
 }
