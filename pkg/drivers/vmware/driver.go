@@ -90,6 +90,7 @@ func (d *Driver) SetConfigFromFlags(flags drivers.DriverOptions) error {
 	d.SSHPort = 22
 	d.NoShare = flags.Bool("vmware-no-share")
 	d.WaitIP = flags.Int("vmware-wait-ip")
+	d.NetworkType = flags.String("vmware-network-type")
 
 	// We support a maximum of 16 cpu to be consistent with Virtual Hardware 10
 	// specs.

@@ -26,12 +26,13 @@ import (
 )
 
 const (
-	defaultSSHUser  = "docker"
-	defaultSSHPass  = "tcuser"
-	defaultDiskSize = 20000
-	defaultCPU      = 1
-	defaultMemory   = 1024
-	defaultWaitIP   = 30000
+	defaultSSHUser     = "docker"
+	defaultSSHPass     = "tcuser"
+	defaultDiskSize    = 20000
+	defaultCPU         = 1
+	defaultMemory      = 1024
+	defaultWaitIP      = 30000
+	defaultNetworkType = "nat"
 )
 
 // Config specifies the configuration of driver VMware
@@ -49,17 +50,19 @@ type Config struct {
 	ConfigDriveURL string
 	NoShare        bool
 
-	WaitIP int
+	WaitIP         int
+	NetworkType    string
 }
 
 // NewConfig creates a new Config
 func NewConfig(hostname, storePath string) *Config {
 	return &Config{
-		CPU:         defaultCPU,
-		Memory:      defaultMemory,
-		DiskSize:    defaultDiskSize,
-		SSHPassword: defaultSSHPass,
-		WaitIP:      defaultWaitIP,
+		CPU:            defaultCPU,
+		Memory:         defaultMemory,
+		DiskSize:       defaultDiskSize,
+		SSHPassword:    defaultSSHPass,
+		WaitIP:         defaultWaitIP,
+		NetworkType:    defaultNetworkType,
 		BaseDriver: &drivers.BaseDriver{
 			SSHUser:     defaultSSHUser,
 			MachineName: hostname,
@@ -124,6 +127,12 @@ func (c *Config) GetCreateFlags() []mcnflag.Flag {
 			Name:   "vmware-wait-ip",
 			Usage:  "time to wait for vmrun to get an ip (in milliseconds)",
 			Value:  defaultWaitIP,
+		},
+		mcnflag.StringFlag{
+			EnvVar: "VMWARE_NETWORK_TYPE",
+			Name:   "vmware-network-type",
+			Usage:  "Network connection type to use (e.g. 'nat', 'bridged', 'hostonly')",
+			Value:  defaultNetworkType,
 		},
 	}
 }
