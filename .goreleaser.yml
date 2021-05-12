@@ -21,10 +21,6 @@ archives:
     files:
     - LICENSE*
     - README*
-  - replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
 checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
 changelog:
