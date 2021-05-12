@@ -25,7 +25,6 @@ archives:
       darwin: Darwin
       linux: Linux
       windows: Windows
-      amd64: x86_64
 checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
 changelog:
@@ -34,17 +33,17 @@ changelog:
     exclude:
       - '^typo'
       - 'version bump'
-# brews:
-#   - folder: Formula
-#     tap:
-#       owner: mroy
-#       name: homebrew-tap
-#     commit_author:
-#       name: Michael Roy
-#       email: mike@mikeroysoft.com
-#     homepage: "https://github.com/machine-drivers/docker-machine-driver-vmware/blob/master/README.md"
-#     description: "Cross-platform docker-machine driver for VMware Fusion and Workstation"
-#     test: |
-#       system "#{bin}/docker-machine-driver-vmware -v"
-#     install: |
-#       bin.install "docker-machine-driver-vmware"
+brews:
+  - folder: Formula
+    tap:
+      owner: mikeroySoft
+      name: homebrew-tap
+    commit_author:
+      name: Michael Roy
+      email: mike@mikeroysoft.com
+    homepage: "https://github.com/machine-drivers/docker-machine-driver-vmware/blob/master/README.md"
+    description: "Cross-platform docker-machine driver for VMware Fusion and Workstation"
+    test: |
+      system "#{bin}/docker-machine-driver-vmware -v"
+    install: |
+      bin.install "docker-machine-driver-vmware"
