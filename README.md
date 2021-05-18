@@ -57,6 +57,7 @@ $ docker-machine create --driver=vmware default
 - `--vmware-cpu-count`: Number of CPUs for the machine (-1 to use the number of CPUs available)
 - `--vmware-disk-size`: Size of disk for host VM (in MB)
 - `--vmware-memory-size`: Size of memory for host VM (in MB)
+- `--vmware-network-type`: Network connection type to use (e.g. 'nat', 'bridged', 'hostonly')
 - `--vmware-no-share`: Disable the mount of your home directory
 - `--vmware-ssh-password`: SSH password
 - `--vmware-ssh-user`: SSH user
@@ -71,6 +72,7 @@ $ docker-machine create --driver=vmware default
 | `--vmware-cpu-count`       | VMWARE_CPU_COUNT       | `1`                      |
 | `--vmware-disk-size`       | VMWARE_DISK_SIZE       | `20000`                  |
 | `--vmware-memory-size`     | VMWARE_MEMORY_SIZE     | `1024`                   |
+| `--vmware-network-type`    | VMWARE_NETWORK_TYPE    | `nat`                    |
 | `--vmware-no-share`        | VMWARE_NO_SHARE        | -                        |
 | `--vmware-ssh-password`    | VMWARE_SSH_PASSWORD    | `tcuser`                 |
 | `--vmware-ssh-user`        | VMWARE_SSH_USER        | `docker`                 |
