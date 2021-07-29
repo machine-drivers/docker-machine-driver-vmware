@@ -3,7 +3,7 @@
 Create Docker machines locally on VMware [Fusion](https://www.vmware.com/products/fusion)
 and [Workstation](https://www.vmware.com/products/workstation).
 
-This driver requires VMware Workstation 14 (Windows/Linux) or VMware Fusion 10 (MacOS)
+This driver requires VMware Workstation 14 (Windows/Linux) or VMware Fusion 10 (macOS)
 to be installed on your host. Earlier versions of Workstation/Fusion might still work
 with this driver, but it's not officially supported.
 
@@ -13,14 +13,17 @@ with this driver, but it's not officially supported.
 > works on VMware Fusion.
 >
 
+## License
+
+The Docker Machine VMware Driver is released under the [Apache License 2.0](https://github.com/machine-drivers/docker-machine-driver-vmware/blob/master/LICENSE) license, for more information see LICENSE or https://www.apache.org/licenses/LICENSE-2.0
 
 ## Installation
 
 ### From a Release
 
 The latest version of the `docker-machine-driver-vmware` binary is available on the
-[GithHub Releases](https://github.com/machine-drivers/docker-machine-driver-vmware/releases) page.
-Download the the binary that corresponds to your OS into a directory residing in your PATH.
+[GitHub Releases](https://github.com/machine-drivers/docker-machine-driver-vmware/releases) page.
+Download the binary that corresponds to your OS into a directory residing in your PATH.
 
 ### From Homebrew
 
@@ -77,8 +80,3 @@ $ docker-machine create --driver=vmware default
 | `--vmware-ssh-password`    | VMWARE_SSH_PASSWORD    | `tcuser`                 |
 | `--vmware-ssh-user`        | VMWARE_SSH_USER        | `docker`                 |
 | `--vmware-wait-ip`         | VMWARE_WAIT_IP         | `30000`                  |
-
-
-## License
-
-It's under the Apache 2 license.
