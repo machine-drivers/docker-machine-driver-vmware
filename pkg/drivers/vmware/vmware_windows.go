@@ -18,17 +18,20 @@ package vmware
 
 import (
 	"fmt"
-	"golang.org/x/sys/windows/registry"
+	"os"
 	"path/filepath"
+
+	"golang.org/x/sys/windows/registry"
 )
 
+// https://docs.microsoft.com/en-us/windows/deployment/usmt/usmt-recognized-environment-variables
 
 func DhcpConfigFiles() string {
-	return `C:\ProgramData\VMware\vmnetdhcp.conf`
+	return filepath.Join(os.Getenv("ALLUSERSPROFILE"), `VMware\vmnetdhcp.conf`)
 }
 
 func DhcpLeaseFiles() string {
-	return `C:\ProgramData\VMware\vmnetdhcp.leases`
+	return filepath.Join(os.Getenv("ALLUSERSPROFILE"), `VMware\vmnetdhcp.leases`)
 }
 
 func SetUmask() {
@@ -67,5 +70,5 @@ func setVmwareCmd(cmd string) string {
 }
 
 func getShareDriveAndName() (string, string, string) {
-	return "Users", "C:\\Users", "/hosthome"
+	return "Users", os.Getenv("PUBLIC"), "/hosthome"
 }
