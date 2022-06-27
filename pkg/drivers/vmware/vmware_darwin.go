@@ -28,7 +28,7 @@ func DhcpConfigFiles() string {
 }
 
 func DhcpLeaseFiles() string {
-	return "/var/db/vmware/*.leases"
+	return "/var/db/dhcpd_leases"
 }
 
 func SetUmask() {
