@@ -152,12 +152,13 @@ func (d *Driver) GetIP() (ip string, err error) {
 
 func (d *Driver) GetState() (state.State, error) {
 	// VMRUN only tells use if the vm is running or not
-	vmxp, err := filepath.EvalSymlinks(d.vmxPath())
+	path := d.vmxPath()
+	vmxp, err := filepath.EvalSymlinks(path)
 	if err != nil {
 		return state.Error, err
 	}
 
-	if stdout, _, _ := vmrun("list"); strings.Contains(stdout, vmxp) {
+	if stdout, _, _ := vmrun("list"); strings.Contains(stdout, vmxp) || strings.Contains(stdout, path) {
 		return state.Running, nil
 	}
 	return state.Stopped, nil
